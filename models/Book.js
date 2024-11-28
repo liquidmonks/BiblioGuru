@@ -14,6 +14,11 @@ const BookSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
+    borrower: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Borrower',
+        default: null,
+    },
 });
 
 module.exports = mongoose.model('Book', BookSchema);

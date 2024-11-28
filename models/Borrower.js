@@ -9,10 +9,12 @@ const BorrowerSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    bookId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Book',
-    },
+    borrowedBooks: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Book',
+        },
+    ],
     borrowDate: {
         type: Date,
         default: Date.now,
