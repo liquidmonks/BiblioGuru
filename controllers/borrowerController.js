@@ -1,7 +1,7 @@
-const Borrower = require('../models/Borrower');
+import Borrower from '../models/Borrower.js';
 
 // Get all borrowers
-exports.getAllBorrowers = async (req, res) => {
+export const getAllBorrowers = async (req, res) => {
     try {
         const borrowers = await Borrower.find().populate('borrowedBooks');
         res.json(borrowers);
@@ -11,7 +11,7 @@ exports.getAllBorrowers = async (req, res) => {
 };
 
 // Add a borrower
-exports.addBorrower = async (req, res) => {
+export const addBorrower = async (req, res) => {
     try {
         const {name, email, borrowedBooks} = req.body;
         const newBorrower = new Borrower({name, email, borrowedBooks});
@@ -23,7 +23,7 @@ exports.addBorrower = async (req, res) => {
 };
 
 // Get a borrower by ID
-exports.getBorrowerById = async (req, res) => {
+export const getBorrowerById = async (req, res) => {
     try {
         const borrower = await Borrower.findById(req.params.id).populate('borrowedBooks');
         if (!borrower) {
@@ -36,7 +36,7 @@ exports.getBorrowerById = async (req, res) => {
 };
 
 // Update a borrower
-exports.updateBorrower = async (req, res) => {
+export const updateBorrower = async (req, res) => {
     try {
         const updatedBorrower = await Borrower.findByIdAndUpdate(req.params.id, req.body, {
             new: true,
@@ -51,7 +51,7 @@ exports.updateBorrower = async (req, res) => {
 };
 
 // Delete a borrower
-exports.deleteBorrower = async (req, res) => {
+export const deleteBorrower = async (req, res) => {
     try {
         const deletedBorrower = await Borrower.findByIdAndDelete(req.params.id);
         if (!deletedBorrower) {

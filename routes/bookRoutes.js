@@ -1,13 +1,14 @@
-const express = require('express');
+import express from 'express';
+import {addBook, deleteBook, getAllBooks, getBookById, updateBook} from '../controllers/bookController.js';
+import protect from '../middleware/authMiddleware.js';
+
 const router = express.Router();
-const bookController = require('../controllers/bookController');
-const protect = require('../middleware/authMiddleware');
 
 // CRUD routes for books
-router.get('/', bookController.getAllBooks);
-router.post('/', protect, bookController.addBook);
-router.get('/:id', protect, bookController.getBookById);
-router.put('/:id', protect, bookController.updateBook);
-router.delete('/:id', protect, bookController.deleteBook);
+router.get('/', getAllBooks);
+router.post('/', protect, addBook);
+router.get('/:id', protect, getBookById);
+router.put('/:id', protect, updateBook);
+router.delete('/:id', protect, deleteBook);
 
-module.exports = router;
+export default router;

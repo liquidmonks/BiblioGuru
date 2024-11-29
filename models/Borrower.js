@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const BorrowerSchema = new mongoose.Schema({
     name: {
@@ -22,4 +22,5 @@ const BorrowerSchema = new mongoose.Schema({
     returnDate: Date,
 });
 
-module.exports = mongoose.model('Borrower', BorrowerSchema);
+const Borrower = mongoose.model('Borrower', BorrowerSchema);
+export default Borrower;

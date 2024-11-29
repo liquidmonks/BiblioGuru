@@ -1,7 +1,7 @@
-const Book = require('../models/Book');
+import Book from '../models/Book.js';
 
 // Get all books
-exports.getAllBooks = async (req, res) => {
+export const getAllBooks = async (req, res) => {
     try {
         const books = await Book.find().populate('borrower');
         res.json(books);
@@ -11,7 +11,7 @@ exports.getAllBooks = async (req, res) => {
 };
 
 // Add a book
-exports.addBook = async (req, res) => {
+export const addBook = async (req, res) => {
     try {
         const {title, author, imageUrl} = req.body;
         const newBook = new Book({title, author, imageUrl});
@@ -23,7 +23,7 @@ exports.addBook = async (req, res) => {
 };
 
 // Get a book by ID
-exports.getBookById = async (req, res) => {
+export const getBookById = async (req, res) => {
     try {
         const book = await Book.findById(req.params.id).populate('borrower');
         if (!book) {
@@ -36,7 +36,7 @@ exports.getBookById = async (req, res) => {
 };
 
 // Update a book
-exports.updateBook = async (req, res) => {
+export const updateBook = async (req, res) => {
     try {
         const updatedBook = await Book.findByIdAndUpdate(req.params.id, req.body, {
             new: true,
@@ -51,7 +51,7 @@ exports.updateBook = async (req, res) => {
 };
 
 // Delete a book
-exports.deleteBook = async (req, res) => {
+export const deleteBook = async (req, res) => {
     try {
         const deletedBook = await Book.findByIdAndDelete(req.params.id);
         if (!deletedBook) {

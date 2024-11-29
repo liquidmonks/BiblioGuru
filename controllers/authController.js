@@ -1,12 +1,12 @@
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
+import jwt from 'jsonwebtoken';
+import bcrypt from 'bcryptjs';
 
 // Placeholder admin credentials (this should be stored securely in production)
 const ADMIN_USERNAME = 'admin';
 const ADMIN_PASSWORD_HASH = bcrypt.hashSync('password123', 10); // Hashing the password
 
 // Admin login
-exports.adminLogin = async (req, res) => {
+export const adminLogin = async (req, res) => {
     try {
         const {username, password} = req.body;
 

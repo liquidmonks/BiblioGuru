@@ -1,10 +1,12 @@
 {
   "name": "biblioguru",
   "version": "1.0.0",
-  "description": "> *A personal library collection and loan management system.*",
-  "main": "index.js",
+  "description": "A personal library collection and loan management system.",
+  "type": "module",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js",
+    "dev": "nodemon server.js"
   },
   "keywords": [],
   "author": "",
