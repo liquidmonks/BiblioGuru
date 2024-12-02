@@ -1,8 +1,10 @@
 import {useEffect, useState} from 'react';
 import axios from 'axios';
+import {useNavigate} from 'react-router-dom';
 
 function BorrowerPage() {
     const [books, setBooks] = useState([]);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchBooks = async () => {
@@ -16,6 +18,36 @@ function BorrowerPage() {
 
         fetchBooks();
     }, []);
+
+    const handleBorrow = async (bookId) => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            alert('You need to register/login to borrow this book.');
+            navigate('/borrower-login');
+            return;
+        }
+
+        try {
+            const response = await axios.post(
+                `http://localhost:5000/api/loans/borrow/${bookId}`,
+                {},
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+            alert(response.data.message);
+            // Update the book list to reflect the new availability status
+            const updatedBooks = books.map((book) =>
+                book._id === bookId ? {...book, borrowed: true} : book
+            );
+            setBooks(updatedBooks);
+        } catch (error) {
+            console.error('Error borrowing book:', error);
+            alert('Failed to borrow the book. Please try again later.');
+        }
+    };
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-purple-100 to-blue-100 p-8">
@@ -39,12 +71,12 @@ function BorrowerPage() {
                             {book.borrowed ? (
                                 <span
                                     className="absolute top-2 right-2 bg-red-500 text-white px-3 py-1 rounded-lg text-sm">
-                  Checked Out
-                </span>
+                                    Checked Out
+                                </span>
                             ) : (
                                 <button
                                     className="absolute top-2 right-2 bg-green-500 text-white px-3 py-1 rounded-lg text-sm transition-opacity hover:opacity-80"
-                                    onClick={() => alert('You need to register/login to borrow this book.')}
+                                    onClick={() => handleBorrow(book._id)}
                                 >
                                     Available
                                 </button>
