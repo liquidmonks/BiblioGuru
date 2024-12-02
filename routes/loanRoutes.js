@@ -4,9 +4,8 @@ import protect from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-// Borrow a book (requires authentication)
+// Loan management routes
 router.post('/borrow/:id', protect, borrowBook);
-// Return a book (requires authentication)
 router.post('/return/:id', protect, returnBook);
 
 export default router;
