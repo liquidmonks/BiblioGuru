@@ -8,6 +8,7 @@ export const getAllBorrowers = async (req, res) => {
         const borrowers = await Borrower.find().populate('borrowedBooks');
         res.json(borrowers);
     } catch (err) {
+        console.error('Error fetching borrowers:', err.message);
         res.status(500).json({error: 'Server Error'});
     }
 };
@@ -16,6 +17,12 @@ export const getAllBorrowers = async (req, res) => {
 export const registerBorrower = async (req, res) => {
     try {
         const {name, email, password} = req.body;
+
+        // Check if borrower with the given email already exists
+        const existingBorrower = await Borrower.findOne({email});
+        if (existingBorrower) {
+            return res.status(400).json({error: 'Email is already registered'});
+        }
 
         // Hash password before saving it in the database
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -28,6 +35,7 @@ export const registerBorrower = async (req, res) => {
 
         res.status(201).json({token, borrower: savedBorrower});
     } catch (err) {
+        console.error('Error registering borrower:', err.message);
         res.status(500).json({error: 'Server Error'});
     }
 };
@@ -53,6 +61,7 @@ export const loginBorrower = async (req, res) => {
 
         res.json({token});
     } catch (err) {
+        console.error('Error during login:', err.message);
         res.status(500).json({error: 'Server error'});
     }
 };

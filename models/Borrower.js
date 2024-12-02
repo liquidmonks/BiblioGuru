@@ -8,6 +8,11 @@ const BorrowerSchema = new mongoose.Schema({
     email: {
         type: String,
         required: true,
+        unique: true, // Ensure email uniqueness
+    },
+    password: {
+        type: String,
+        required: true,
     },
     borrowedBooks: [
         {
