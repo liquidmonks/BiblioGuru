@@ -1,14 +1,20 @@
 import express from 'express';
-import {addBook, deleteBook, getAllBooks, getBookById, updateBook} from '../controllers/bookController.js';
+import {
+    addBorrower,
+    deleteBorrower,
+    getAllBorrowers,
+    getBorrowerById,
+    updateBorrower,
+} from '../controllers/borrowerController.js';
 import protect from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-// CRUD routes for books
-router.get('/', getAllBooks);
-router.post('/', protect, addBook);
-router.get('/:id', protect, getBookById);
-router.put('/:id', protect, updateBook);
-router.delete('/:id', protect, deleteBook);
+// Admin routes to manage borrowers (protected)
+router.get('/', protect, getAllBorrowers);
+router.post('/', protect, addBorrower);
+router.get('/:id', protect, getBorrowerById);
+router.put('/:id', protect, updateBorrower);
+router.delete('/:id', protect, deleteBorrower);
 
 export default router;
