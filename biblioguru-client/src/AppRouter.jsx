@@ -8,6 +8,9 @@ function AppRouter() {
             <Routes>
                 <Route path="/" element={<LoginPage/>}/>
                 <Route path="/dashboard" element={<Dashboard/>}/>
+                {/* Placeholder routes for future components */}
+                <Route path="/manage-books" element={<div>Manage Books Page (Coming Soon)</div>}/>
+                <Route path="/manage-borrowers" element={<div>Manage Borrowers Page (Coming Soon)</div>}/>
             </Routes>
         </Router>
     );
