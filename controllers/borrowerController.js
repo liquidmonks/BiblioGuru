@@ -1,64 +1,58 @@
 import Borrower from '../models/Borrower.js';
+import jwt from 'jsonwebtoken';
+import bcrypt from 'bcryptjs';
 
 // Get all borrowers
 export const getAllBorrowers = async (req, res) => {
     try {
-        const borrowers = await Borrower.find();
+        const borrowers = await Borrower.find().populate('borrowedBooks');
         res.json(borrowers);
     } catch (err) {
         res.status(500).json({error: 'Server Error'});
     }
 };
 
-// Get a borrower by ID
-export const getBorrowerById = async (req, res) => {
+// Register a new borrower
+export const registerBorrower = async (req, res) => {
     try {
-        const borrower = await Borrower.findById(req.params.id);
-        if (!borrower) {
-            return res.status(404).json({error: 'Borrower not found'});
-        }
-        res.json(borrower);
-    } catch (err) {
-        res.status(500).json({error: 'Server Error'});
-    }
-};
+        const {name, email, password} = req.body;
 
-// Add a new borrower
-export const addBorrower = async (req, res) => {
-    try {
-        const {name, email} = req.body;
-        const newBorrower = new Borrower({name, email});
+        // Hash password before saving it in the database
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const newBorrower = new Borrower({name, email, password: hashedPassword});
         const savedBorrower = await newBorrower.save();
-        res.status(201).json(savedBorrower);
+
+        // Generate a JWT token for the newly registered borrower
+        const token = jwt.sign({id: savedBorrower._id}, process.env.JWT_SECRET, {expiresIn: '1h'});
+
+        res.status(201).json({token, borrower: savedBorrower});
     } catch (err) {
         res.status(500).json({error: 'Server Error'});
     }
 };
 
-// Update a borrower
-export const updateBorrower = async (req, res) => {
+// Borrower login
+export const loginBorrower = async (req, res) => {
     try {
-        const updatedBorrower = await Borrower.findByIdAndUpdate(req.params.id, req.body, {
-            new: true,
-        });
-        if (!updatedBorrower) {
-            return res.status(404).json({error: 'Borrower not found'});
-        }
-        res.json(updatedBorrower);
-    } catch (err) {
-        res.status(500).json({error: 'Server Error'});
-    }
-};
+        const {email, password} = req.body;
+        const borrower = await Borrower.findOne({email});
 
-// Delete a borrower
-export const deleteBorrower = async (req, res) => {
-    try {
-        const deletedBorrower = await Borrower.findByIdAndDelete(req.params.id);
-        if (!deletedBorrower) {
-            return res.status(404).json({error: 'Borrower not found'});
+        if (!borrower) {
+            return res.status(401).json({error: 'Invalid credentials'});
         }
-        res.json({message: 'Borrower deleted successfully'});
+
+        // Compare the password
+        const isMatch = await bcrypt.compare(password, borrower.password);
+        if (!isMatch) {
+            return res.status(401).json({error: 'Invalid credentials'});
+        }
+
+        // Generate JWT token
+        const token = jwt.sign({id: borrower._id}, process.env.JWT_SECRET, {expiresIn: '1h'});
+
+        res.json({token});
     } catch (err) {
-        res.status(500).json({error: 'Server Error'});
+        res.status(500).json({error: 'Server error'});
     }
 };

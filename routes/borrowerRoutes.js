@@ -1,20 +1,11 @@
 import express from 'express';
-import {
-    addBorrower,
-    deleteBorrower,
-    getAllBorrowers,
-    getBorrowerById,
-    updateBorrower,
-} from '../controllers/borrowerController.js';
-import protect from '../middleware/authMiddleware.js';
+import {getAllBorrowers, loginBorrower, registerBorrower} from '../controllers/borrowerController.js';
 
 const router = express.Router();
 
-// Admin routes to manage borrowers (protected)
-router.get('/', protect, getAllBorrowers);
-router.post('/', protect, addBorrower);
-router.get('/:id', protect, getBorrowerById);
-router.put('/:id', protect, updateBorrower);
-router.delete('/:id', protect, deleteBorrower);
+// CRUD routes for borrowers
+router.get('/', getAllBorrowers);
+router.post('/register', registerBorrower);
+router.post('/login', loginBorrower);
 
 export default router;
