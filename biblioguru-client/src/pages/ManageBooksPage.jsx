@@ -1,25 +1,55 @@
-import React from 'react';
+import {useEffect, useState} from 'react';
+import axios from 'axios';
 
 function ManageBooksPage() {
+    const [books, setBooks] = useState([]);
+    const [newBook, setNewBook] = useState({title: '', author: '', imageUrl: '', description: ''});
+
+    useEffect(() => {
+        fetchBooks();
+    }, []);
+
+    const fetchBooks = async () => {
+        try {
+            const response = await axios.get('http://localhost:5000/api/books');
+            setBooks(response.data);
+        } catch (error) {
+            console.error('Error fetching books:', error);
+        }
+    };
+
+    const handleAddBook = async () => {
+        try {
+            await axios.post('http://localhost:5000/api/books', newBook);
+            fetchBooks();
+            setNewBook({title: '', author: '', imageUrl: '', description: ''});
+        } catch (error) {
+            console.error('Error adding book:', error);
+        }
+    };
+
+    const handleDeleteBook = async (bookId) => {
+        try {
+            await axios.delete(`http://localhost:5000/api/books/${bookId}`);
+            fetchBooks();
+        } catch (error) {
+            console.error('Error deleting book:', error);
+        }
+    };
+
     return (
-        <div className="min-h-screen bg-gradient-to-b from-yellow-100 to-orange-200 p-8">
-            <div className="max-w-6xl mx-auto bg-white rounded-lg shadow-md p-6">
-                <h1 className="text-4xl font-bold text-center mb-6 text-gray-800">Manage Books</h1>
-                <p className="text-lg text-gray-600 text-center">
-                    Add, edit, or remove books from the library's collection.
-                </p>
-                {/* Placeholder content for managing books */}
-                <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="bg-gray-100 p-4 rounded shadow-md">
-                        <h2 className="text-xl font-bold">Book: "Sample Book Title"</h2>
-                        <p>Author: Jane Doe</p>
-                        <button
-                            className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600">Edit
-                            Book
-                        </button>
-                    </div>
+        <div>
+            <h2>Manage Books</h2>
+            <input type="text" value={newBook.title} onChange={(e) => setNewBook({...newBook, title: e.target.value})}
+                   placeholder="Title"/>
+            {/* Add more input fields for author, imageUrl, and description */}
+            <button onClick={handleAddBook}>Add Book</button>
+            {books.map((book) => (
+                <div key={book._id}>
+                    <h3>{book.title}</h3>
+                    <button onClick={() => handleDeleteBook(book._id)}>Delete</button>
                 </div>
-            </div>
+            ))}
         </div>
     );
 }
