@@ -3,7 +3,10 @@ import LoginPage from './pages/LoginPage';
 import Dashboard from './pages/Dashboard';
 import BorrowerPage from './pages/BorrowerPage';
 import RegisterPage from './pages/RegisterPage';
-import BorrowerLoginPage from './pages/BorrowerLoginPage';
+import ReportsPage from './pages/ReportsPage';
+import ManageBooksPage from './pages/ManageBooksPage';
+import ManageBorrowersPage from './pages/ManageBorrowersPage';
+import ManageLoansPage from './pages/ManageLoansPage';
 
 function AppRouter() {
     return (
@@ -13,7 +16,10 @@ function AppRouter() {
                 <Route path="/login" element={<LoginPage/>}/>
                 <Route path="/dashboard" element={<Dashboard/>}/>
                 <Route path="/register" element={<RegisterPage/>}/>
-                <Route path="/borrower-login" element={<BorrowerLoginPage/>}/>
+                <Route path="/reports" element={<ReportsPage/>}/>
+                <Route path="/manage-books" element={<ManageBooksPage/>}/>
+                <Route path="/manage-borrowers" element={<ManageBorrowersPage/>}/>
+                <Route path="/manage-loans" element={<ManageLoansPage/>}/>
             </Routes>
         </Router>
     );
