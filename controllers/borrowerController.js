@@ -18,10 +18,10 @@ export const registerBorrower = async (req, res) => {
     try {
         const {name, email, password} = req.body;
 
-        // Check if borrower with the given email already exists
+        // Check if the borrower already exists
         const existingBorrower = await Borrower.findOne({email});
         if (existingBorrower) {
-            return res.status(400).json({error: 'Email is already registered'});
+            return res.status(400).json({error: 'Borrower already exists'});
         }
 
         // Hash password before saving it in the database
@@ -35,7 +35,7 @@ export const registerBorrower = async (req, res) => {
 
         res.status(201).json({token, borrower: savedBorrower});
     } catch (err) {
-        console.error('Error registering borrower:', err.message);
+        console.error('Error during borrower registration:', err.message);
         res.status(500).json({error: 'Server Error'});
     }
 };
@@ -44,8 +44,11 @@ export const registerBorrower = async (req, res) => {
 export const loginBorrower = async (req, res) => {
     try {
         const {email, password} = req.body;
-        const borrower = await Borrower.findOne({email});
+        if (!email || !password) {
+            return res.status(400).json({error: 'Email and password are required'});
+        }
 
+        const borrower = await Borrower.findOne({email});
         if (!borrower) {
             return res.status(401).json({error: 'Invalid credentials'});
         }
