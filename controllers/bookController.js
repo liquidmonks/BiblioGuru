@@ -10,41 +10,31 @@ export const getAllBooks = async (req, res) => {
     }
 };
 
-// Get a book by ID
-export const getBookById = async (req, res) => {
+// Create a new book
+export const createBook = async (req, res) => {
     try {
-        const book = await Book.findById(req.params.id);
-        if (!book) {
-            return res.status(404).json({error: 'Book not found'});
-        }
-        res.json(book);
-    } catch (err) {
-        res.status(500).json({error: 'Server Error'});
-    }
-};
-
-// Add a new book
-export const addBook = async (req, res) => {
-    try {
-        const {title, author, imageUrl} = req.body;
-        const newBook = new Book({title, author, imageUrl});
+        const {title, author, imageUrl, description} = req.body;
+        const newBook = new Book({title, author, imageUrl, description});
         const savedBook = await newBook.save();
+
         res.status(201).json(savedBook);
     } catch (err) {
         res.status(500).json({error: 'Server Error'});
     }
 };
 
-// Update a book
+// Update book details
 export const updateBook = async (req, res) => {
     try {
-        const updatedBook = await Book.findByIdAndUpdate(req.params.id, req.body, {
-            new: true,
-        });
+        const bookId = req.params.id;
+        const updates = req.body;
+
+        const updatedBook = await Book.findByIdAndUpdate(bookId, updates, {new: true});
         if (!updatedBook) {
             return res.status(404).json({error: 'Book not found'});
         }
-        res.json(updatedBook);
+
+        res.status(200).json(updatedBook);
     } catch (err) {
         res.status(500).json({error: 'Server Error'});
     }
@@ -53,11 +43,14 @@ export const updateBook = async (req, res) => {
 // Delete a book
 export const deleteBook = async (req, res) => {
     try {
-        const deletedBook = await Book.findByIdAndDelete(req.params.id);
+        const bookId = req.params.id;
+        const deletedBook = await Book.findByIdAndDelete(bookId);
+
         if (!deletedBook) {
             return res.status(404).json({error: 'Book not found'});
         }
-        res.json({message: 'Book deleted successfully'});
+
+        res.status(200).json({message: 'Book deleted successfully'});
     } catch (err) {
         res.status(500).json({error: 'Server Error'});
     }

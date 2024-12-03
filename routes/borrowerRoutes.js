@@ -1,17 +1,18 @@
 import express from 'express';
 import {
+    deleteBorrower,
     getAllBorrowers,
     loginBorrower,
     registerBorrower,
-    updateBorrowerPassword
+    updateBorrower
 } from '../controllers/borrowerController.js';
 
 const router = express.Router();
 
-// CRUD routes for borrowers
 router.get('/', getAllBorrowers);
 router.post('/register', registerBorrower);
 router.post('/login', loginBorrower);
-router.put('/:id', updateBorrowerPassword); // New route for updating borrower's password
+router.put('/:id', updateBorrower); // Update borrower details
+router.delete('/:id', deleteBorrower); // Delete a borrower
 
 export default router;
