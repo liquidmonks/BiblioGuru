@@ -8,7 +8,7 @@ export const getAllBorrowers = async (req, res) => {
         const borrowers = await Borrower.find().populate('borrowedBooks');
         res.json(borrowers);
     } catch (err) {
-        console.error('Error fetching borrowers:', err.message);
+        console.error("Error fetching borrowers:", err.message);
         res.status(500).json({error: 'Server Error'});
     }
 };
@@ -18,10 +18,8 @@ export const registerBorrower = async (req, res) => {
     try {
         const {name, email, password} = req.body;
 
-        // Check if the borrower already exists
-        const existingBorrower = await Borrower.findOne({email});
-        if (existingBorrower) {
-            return res.status(400).json({error: 'Borrower already exists'});
+        if (!name || !email || !password) {
+            return res.status(400).json({error: 'Please provide all required fields: name, email, password'});
         }
 
         // Hash password before saving it in the database
@@ -31,11 +29,16 @@ export const registerBorrower = async (req, res) => {
         const savedBorrower = await newBorrower.save();
 
         // Generate a JWT token for the newly registered borrower
+        if (!process.env.JWT_SECRET) {
+            console.error("JWT_SECRET is not defined");
+            return res.status(500).json({error: 'Server error'});
+        }
+
         const token = jwt.sign({id: savedBorrower._id}, process.env.JWT_SECRET, {expiresIn: '1h'});
 
         res.status(201).json({token, borrower: savedBorrower});
     } catch (err) {
-        console.error('Error during borrower registration:', err.message);
+        console.error("Error registering borrower:", err.message);
         res.status(500).json({error: 'Server Error'});
     }
 };
@@ -44,11 +47,13 @@ export const registerBorrower = async (req, res) => {
 export const loginBorrower = async (req, res) => {
     try {
         const {email, password} = req.body;
+
         if (!email || !password) {
-            return res.status(400).json({error: 'Email and password are required'});
+            return res.status(400).json({error: 'Please provide both email and password'});
         }
 
         const borrower = await Borrower.findOne({email});
+
         if (!borrower) {
             return res.status(401).json({error: 'Invalid credentials'});
         }
@@ -60,11 +65,16 @@ export const loginBorrower = async (req, res) => {
         }
 
         // Generate JWT token
+        if (!process.env.JWT_SECRET) {
+            console.error("JWT_SECRET is not defined");
+            return res.status(500).json({error: 'Server error'});
+        }
+
         const token = jwt.sign({id: borrower._id}, process.env.JWT_SECRET, {expiresIn: '1h'});
 
         res.json({token});
     } catch (err) {
-        console.error('Error during login:', err.message);
+        console.error("Error during login:", err.message);
         res.status(500).json({error: 'Server error'});
     }
 };
