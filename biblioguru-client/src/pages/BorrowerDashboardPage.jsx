@@ -75,6 +75,11 @@ function BorrowerDashboardPage() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         {availableBooks.map((book) => (
                             <div key={book._id} className="bg-white rounded-lg shadow-md p-6">
+                                <img
+                                    src={book.imageUrl || 'https://via.placeholder.com/150'}
+                                    alt={book.title}
+                                    className="w-full h-48 object-cover mb-4 rounded"
+                                />
                                 <h3 className="text-2xl font-semibold mb-2">{book.title}</h3>
                                 <p className="text-gray-600 mb-4">By {book.author}</p>
                                 <button
@@ -92,6 +97,11 @@ function BorrowerDashboardPage() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         {borrowedBooks.map((book) => (
                             <div key={book._id} className="bg-white rounded-lg shadow-md p-6">
+                                <img
+                                    src={book.imageUrl || 'https://via.placeholder.com/150'}
+                                    alt={book.title}
+                                    className="w-full h-48 object-cover mb-4 rounded"
+                                />
                                 <h3 className="text-2xl font-semibold mb-2">{book.title}</h3>
                                 <p className="text-gray-600 mb-4">By {book.author}</p>
                                 <button
