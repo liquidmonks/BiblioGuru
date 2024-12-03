@@ -1,4 +1,4 @@
-import {useNavigate} from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 import {useEffect} from 'react';
 
 function Dashboard() {
@@ -26,30 +26,30 @@ function Dashboard() {
 
                 {/* Navigation Buttons */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                    <button
-                        onClick={() => navigate('/manage-books')}
-                        className="bg-gradient-to-r from-blue-500 to-blue-600 text-white font-bold py-4 px-6 rounded-lg shadow-md hover:shadow-xl hover:bg-blue-700 transform transition duration-300"
+                    <Link
+                        to="/manage-books"
+                        className="bg-gradient-to-r from-blue-500 to-blue-600 text-white font-bold py-4 px-6 rounded-lg shadow-md hover:shadow-xl hover:bg-blue-700 transform transition duration-300 flex items-center justify-center"
                     >
                         📚 Manage Books
-                    </button>
-                    <button
-                        onClick={() => navigate('/manage-borrowers')}
-                        className="bg-gradient-to-r from-green-500 to-green-600 text-white font-bold py-4 px-6 rounded-lg shadow-md hover:shadow-xl hover:bg-green-700 transform transition duration-300"
+                    </Link>
+                    <Link
+                        to="/manage-borrowers"
+                        className="bg-gradient-to-r from-green-500 to-green-600 text-white font-bold py-4 px-6 rounded-lg shadow-md hover:shadow-xl hover:bg-green-700 transform transition duration-300 flex items-center justify-center"
                     >
                         👥 Manage Borrowers
-                    </button>
-                    <button
-                        onClick={() => navigate('/manage-loans')}
-                        className="bg-gradient-to-r from-yellow-500 to-yellow-600 text-white font-bold py-4 px-6 rounded-lg shadow-md hover:shadow-xl hover:bg-yellow-700 transform transition duration-300"
+                    </Link>
+                    <Link
+                        to="/manage-loans"
+                        className="bg-gradient-to-r from-yellow-500 to-yellow-600 text-white font-bold py-4 px-6 rounded-lg shadow-md hover:shadow-xl hover:bg-yellow-700 transform transition duration-300 flex items-center justify-center"
                     >
                         🔄 Manage Loans
-                    </button>
-                    <button
-                        onClick={() => navigate('/reports')}
-                        className="bg-gradient-to-r from-purple-500 to-purple-600 text-white font-bold py-4 px-6 rounded-lg shadow-md hover:shadow-xl hover:bg-purple-700 transform transition duration-300"
+                    </Link>
+                    <Link
+                        to="/reports"
+                        className="bg-gradient-to-r from-purple-500 to-purple-600 text-white font-bold py-4 px-6 rounded-lg shadow-md hover:shadow-xl hover:bg-purple-700 transform transition duration-300 flex items-center justify-center"
                     >
                         📊 Generate Reports
-                    </button>
+                    </Link>
                 </div>
             </div>
         </div>
