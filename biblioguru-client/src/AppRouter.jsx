@@ -3,10 +3,7 @@ import LoginPage from './pages/LoginPage';
 import Dashboard from './pages/Dashboard';
 import BorrowerPage from './pages/BorrowerPage';
 import RegisterPage from './pages/RegisterPage';
-import ReportsPage from './pages/ReportsPage';
-import ManageBooksPage from './pages/ManageBooksPage';
-import ManageBorrowersPage from './pages/ManageBorrowersPage';
-import ManageLoansPage from './pages/ManageLoansPage';
+import BorrowerDashboardPage from './pages/BorrowerDashboardPage'; // Import the new page
 
 function AppRouter() {
     return (
@@ -16,10 +13,7 @@ function AppRouter() {
                 <Route path="/login" element={<LoginPage/>}/>
                 <Route path="/dashboard" element={<Dashboard/>}/>
                 <Route path="/register" element={<RegisterPage/>}/>
-                <Route path="/reports" element={<ReportsPage/>}/>
-                <Route path="/manage-books" element={<ManageBooksPage/>}/>
-                <Route path="/manage-borrowers" element={<ManageBorrowersPage/>}/>
-                <Route path="/manage-loans" element={<ManageLoansPage/>}/>
+                <Route path="/borrower-dashboard" element={<BorrowerDashboardPage/>}/> {/* Add this */}
             </Routes>
         </Router>
     );

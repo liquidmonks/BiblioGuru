@@ -1,53 +1,55 @@
 import mongoose from 'mongoose';
+import Book from './models/Book.js';
 import dotenv from 'dotenv';
-import bcrypt from 'bcryptjs';
-import Borrower from './models/Borrower.js';
 
-// Load environment variables
 dotenv.config();
 
-// Connect to MongoDB
-const connectDB = async () => {
-    try {
-        await mongoose.connect(process.env.MONGO_URI, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-        });
+mongoose
+    .connect(process.env.MONGO_URI, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+    })
+    .then(() => {
         console.log('MongoDB Connected...');
-    } catch (err) {
-        console.error('Error connecting to MongoDB:', err.message);
+    })
+    .catch((err) => {
+        console.error('Database connection error:', err.message);
         process.exit(1);
-    }
-};
+    });
 
-const seedData = async () => {
-    await connectDB();
-
-    // Sample borrower data
-    const sampleBorrowers = [
+const seedBooks = async () => {
+    const books = [
         {
-            name: 'John Doe',
-            email: 'john.doe@example.com',
-            password: await bcrypt.hash('password123', 10), // hash the password before saving
+            title: 'The Great Gatsby',
+            author: 'F. Scott Fitzgerald',
+        },
+        {
+            title: '1984',
+            author: 'George Orwell',
+        },
+        {
+            title: 'To Kill a Mockingbird',
+            author: 'Harper Lee',
+        },
+        {
+            title: 'The Catcher in the Rye',
+            author: 'J.D. Salinger',
+        },
+        {
+            title: 'Moby Dick',
+            author: 'Herman Melville',
         },
     ];
 
     try {
-        // Clear existing data
-        await Borrower.deleteMany();
-        console.log('Existing borrowers deleted');
-
-        // Insert sample data
-        await Borrower.insertMany(sampleBorrowers);
-        console.log('Sample borrower added to the database');
-
-        // Disconnect
-        mongoose.connection.close();
+        await Book.deleteMany(); // Clear existing books
+        await Book.insertMany(books);
+        console.log('Sample books added to database.');
+        process.exit();
     } catch (err) {
-        console.error('Error seeding data:', err.message);
+        console.error('Error seeding books:', err);
         process.exit(1);
     }
 };
 
-// Run the seeding function
-seedData();
+seedBooks();
