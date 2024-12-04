@@ -25,11 +25,12 @@ connectDB().catch((err) => {
     process.exit(1);
 });
 
+// Initialize express app
 const app = express();
 
 // Middleware
-app.use(express.json());
-app.use(cors());
+app.use(express.json()); // Allows express to parse JSON requests
+app.use(cors()); // Enable CORS for all origins (could restrict to specific origins if needed)
 
 // Define routes
 app.use('/api/books', bookRoutes);
@@ -37,8 +38,19 @@ app.use('/api/borrowers', borrowerRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/loans', loanRoutes); // Add loan routes
 
-const PORT = process.env.PORT || 5000;
+// Error handling middleware (for better error reporting)
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).json({error: 'Something went wrong!'});
+});
 
+// Fallback for undefined routes
+app.use((req, res) => {
+    res.status(404).json({error: 'Route not found'});
+});
+
+// Start server
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });

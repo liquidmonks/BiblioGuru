@@ -1,6 +1,5 @@
 import Book from '../models/Book.js';
 import Loan from '../models/Loan.js';
-import Borrower from '../models/Borrower.js';
 
 // Borrow a book
 export const borrowBook = async (req, res) => {
@@ -20,8 +19,7 @@ export const borrowBook = async (req, res) => {
         const loan = new Loan({
             borrower: borrowerId,
             book: book._id,
-            status: 'Borrowed', // Added status to make sure it's clear
-            borrowedDate: new Date(),
+            status: 'Borrowed'
         });
 
         await loan.save();
@@ -29,13 +27,6 @@ export const borrowBook = async (req, res) => {
         book.borrowed = true;
         book.borrower = borrowerId;
         await book.save();
-
-        // Update borrower's loan record
-        const borrower = await Borrower.findById(borrowerId);
-        if (borrower) {
-            borrower.borrowedBooks.push(book._id);
-            await borrower.save();
-        }
 
         res.status(200).json({message: 'Book borrowed successfully'});
     } catch (err) {
@@ -55,7 +46,7 @@ export const returnBook = async (req, res) => {
             return res.status(400).json({error: 'Book is not borrowed'});
         }
 
-        const borrowerId = book.borrower;
+        // Set the book as not borrowed
         book.borrowed = false;
         book.borrower = null;
         await book.save();
@@ -68,22 +59,13 @@ export const returnBook = async (req, res) => {
             await loan.save();
         }
 
-        // Update borrower to remove the returned book
-        const borrower = await Borrower.findById(borrowerId);
-        if (borrower) {
-            borrower.borrowedBooks = borrower.borrowedBooks.filter(
-                (borrowedBook) => borrowedBook.toString() !== book._id.toString()
-            );
-            await borrower.save();
-        }
-
         res.status(200).json({message: 'Book returned successfully'});
     } catch (err) {
         res.status(500).json({error: 'Server Error'});
     }
 };
 
-// Get loan history
+// Get loan history for a borrower
 export const getLoanHistory = async (req, res) => {
     try {
         const borrowerId = req.user.id;
@@ -95,10 +77,11 @@ export const getLoanHistory = async (req, res) => {
     }
 };
 
-// Get all loans for admin
+// Get all loans (Admin view)
 export const getAllLoans = async (req, res) => {
     try {
-        const loans = await Loan.find().populate('book borrower');
+        const loans = await Loan.find().populate('book').populate('borrower');
+
         res.status(200).json(loans);
     } catch (err) {
         res.status(500).json({error: 'Server Error'});

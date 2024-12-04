@@ -8,6 +8,6 @@ const router = express.Router();
 router.post('/borrow/:id', protect, borrowBook);
 router.post('/return/:id', protect, returnBook);
 router.get('/history', protect, getLoanHistory);
-router.get('/all', protect, getAllLoans); // New route for admin to get all loans
+router.get('/', protect, getAllLoans); // New route for getting all loans (admin view)
 
 export default router;
