@@ -21,9 +21,10 @@ function BorrowerDashboardPage() {
     useEffect(() => {
         const fetchBooksAndLoans = async () => {
             try {
-                const response = await axios.get('http://localhost:5000/api/books');
-                setAvailableBooks(response.data.filter((book) => !book.borrowed));
-                setBorrowedBooks(response.data.filter((book) => book.borrowed));
+                // Fetch all books
+                const booksResponse = await axios.get('http://localhost:5000/api/books');
+                setAvailableBooks(booksResponse.data.filter((book) => !book.borrowed));
+                setBorrowedBooks(booksResponse.data.filter((book) => book.borrowed && book.borrower === getUserId()));
 
                 // Fetch the borrower's loan history
                 const loanResponse = await axios.get('http://localhost:5000/api/loans/history', {
@@ -35,13 +36,25 @@ function BorrowerDashboardPage() {
                 toast.error('Unable to fetch data, please try again.');
             }
         };
+
+        // Helper function to extract the user ID from the token (assuming JWT)
+        const getUserId = () => {
+            try {
+                const payload = JSON.parse(atob(token.split('.')[1]));
+                return payload.id;
+            } catch (error) {
+                console.error('Failed to extract user ID:', error);
+                return null;
+            }
+        };
+
         fetchBooksAndLoans();
     }, [token]);
 
     const handleBorrowBook = async (bookId) => {
         try {
             setLoading(true);
-            await axios.post(`http://localhost:5000/api/loans/borrow`, {bookId}, {
+            await axios.post(`http://localhost:5000/api/loans/borrow/${bookId}`, {}, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -59,7 +72,7 @@ function BorrowerDashboardPage() {
     const handleReturnBook = async (bookId) => {
         try {
             setLoading(true);
-            await axios.post(`http://localhost:5000/api/loans/return`, {bookId}, {
+            await axios.post(`http://localhost:5000/api/loans/return/${bookId}`, {}, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -99,14 +112,19 @@ function BorrowerDashboardPage() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         {availableBooks.map((book) => (
                             <div key={book._id} className="bg-white rounded-lg shadow-md p-6">
-                                <img src={book.imageUrl} alt={book.title}
-                                     className="w-full h-40 object-cover rounded-md mb-4"/>
+                                <img
+                                    src={book.imageUrl}
+                                    alt={book.title}
+                                    className="w-full h-40 object-cover rounded-md mb-4"
+                                />
                                 <h3 className="text-2xl font-semibold mb-2">{book.title}</h3>
                                 <p className="text-gray-600 mb-4">By {book.author}</p>
                                 <button
                                     onClick={() => handleBorrowBook(book._id)}
                                     disabled={loading}
-                                    className={`bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                    className={`bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 ${
+                                        loading ? 'opacity-50 cursor-not-allowed' : ''
+                                    }`}
                                 >
                                     {loading ? 'Processing...' : 'Borrow'}
                                 </button>
@@ -121,14 +139,19 @@ function BorrowerDashboardPage() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         {borrowedBooks.map((book) => (
                             <div key={book._id} className="bg-white rounded-lg shadow-md p-6">
-                                <img src={book.imageUrl} alt={book.title}
-                                     className="w-full h-40 object-cover rounded-md mb-4"/>
+                                <img
+                                    src={book.imageUrl}
+                                    alt={book.title}
+                                    className="w-full h-40 object-cover rounded-md mb-4"
+                                />
                                 <h3 className="text-2xl font-semibold mb-2">{book.title}</h3>
                                 <p className="text-gray-600 mb-4">By {book.author}</p>
                                 <button
                                     onClick={() => handleReturnBook(book._id)}
                                     disabled={loading}
-                                    className={`bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                    className={`bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 ${
+                                        loading ? 'opacity-50 cursor-not-allowed' : ''
+                                    }`}
                                 >
                                     {loading ? 'Processing...' : 'Return'}
                                 </button>
@@ -145,8 +168,8 @@ function BorrowerDashboardPage() {
                             {loanHistory.length > 0 ? (
                                 loanHistory.map((loan) => (
                                     <li key={loan._id} className="mb-4">
-                                        <strong>{loan.bookTitle}</strong> - Borrowed
-                                        on: {new Date(loan.borrowedDate).toLocaleDateString()}
+                                        <strong>{loan.book.title}</strong> - Borrowed on:{' '}
+                                        {new Date(loan.borrowedDate).toLocaleDateString()}
                                     </li>
                                 ))
                             ) : (

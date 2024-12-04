@@ -5,6 +5,7 @@ import cors from 'cors';
 import bookRoutes from './routes/bookRoutes.js';
 import borrowerRoutes from './routes/borrowerRoutes.js';
 import authRoutes from './routes/authRoutes.js';
+import loanRoutes from './routes/loanRoutes.js'; // Import loan routes
 
 // Load environment variables
 dotenv.config();
@@ -34,6 +35,7 @@ app.use(cors());
 app.use('/api/books', bookRoutes);
 app.use('/api/borrowers', borrowerRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/loans', loanRoutes); // Add loan routes
 
 const PORT = process.env.PORT || 5000;
 

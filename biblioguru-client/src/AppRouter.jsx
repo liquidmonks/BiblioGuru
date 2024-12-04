@@ -1,4 +1,5 @@
-import {BrowserRouter as Router, Route, Routes} from 'react-router-dom';
+import PropTypes from 'prop-types';
+import {BrowserRouter as Router, Navigate, Route, Routes} from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import Dashboard from './pages/Dashboard';
 import BorrowerPage from './pages/BorrowerPage';
@@ -10,7 +11,7 @@ import ManageLoansPage from './pages/ManageLoansPage'; // Import Manage Loans Pa
 import ReportsPage from './pages/ReportsPage'; // Import Reports Page
 import BorrowerLoginPage from './pages/BorrowerLoginPage'; // Import Borrower Login Page
 
-function AppRouter() {
+function AppRouter({redirectTo, element}) {
     return (
         <Router>
             <Routes>
@@ -27,11 +28,20 @@ function AppRouter() {
                 <Route path="/dashboard" element={<Dashboard/>}/>
                 <Route path="/manage-books" element={<ManageBooksPage/>}/>
                 <Route path="/manage-borrowers" element={<ManageBorrowersPage/>}/>
-                <Route path="/manage-loans" element={<ManageLoansPage/>}/>
+                <Route path="/manage-loans" element={element || <ManageLoansPage/>}/>
                 <Route path="/reports" element={<ReportsPage/>}/>
+
+                {/* Redirect Route Example */}
+                {redirectTo && <Route path="*" element={<Navigate to={redirectTo} replace/>}/>}
             </Routes>
         </Router>
     );
 }
+
+// Prop Types Validation
+AppRouter.propTypes = {
+    redirectTo: PropTypes.string,
+    element: PropTypes.element,
+};
 
 export default AppRouter;
