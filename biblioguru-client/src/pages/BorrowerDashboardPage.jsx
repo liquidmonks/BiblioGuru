@@ -29,11 +29,15 @@ function BorrowerDashboardPage() {
 
     const handleBorrowBook = async (bookId) => {
         try {
-            await axios.post(`http://localhost:5000/api/loans/borrow`, {bookId}, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
+            await axios.post(
+                `http://localhost:5000/api/loans/borrow`,
+                {bookId},
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
             window.location.reload(); // Refresh the list after borrowing
         } catch (error) {
             console.error('Error borrowing book:', error);
@@ -42,11 +46,15 @@ function BorrowerDashboardPage() {
 
     const handleReturnBook = async (bookId) => {
         try {
-            await axios.post(`http://localhost:5000/api/loans/return`, {bookId}, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
+            await axios.post(
+                `http://localhost:5000/api/loans/return`,
+                {bookId},
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
             window.location.reload(); // Refresh the list after returning
         } catch (error) {
             console.error('Error returning book:', error);
@@ -61,8 +69,8 @@ function BorrowerDashboardPage() {
     return (
         <div className="min-h-screen bg-gradient-to-b from-green-200 to-blue-200 p-8">
             <div className="max-w-6xl mx-auto">
-                <h1 className="text-4xl font-bold text-center mb-8 text-gray-800">Borrower Dashboard</h1>
-                <div className="flex justify-between mb-8">
+                <div className="flex justify-between items-center mb-8">
+                    <h1 className="text-4xl font-bold text-gray-800">Borrower Dashboard</h1>
                     <button
                         onClick={handleLogout}
                         className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600"
@@ -75,11 +83,7 @@ function BorrowerDashboardPage() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         {availableBooks.map((book) => (
                             <div key={book._id} className="bg-white rounded-lg shadow-md p-6">
-                                <img
-                                    src={book.imageUrl || 'https://via.placeholder.com/150'}
-                                    alt={book.title}
-                                    className="w-full h-48 object-cover mb-4 rounded"
-                                />
+                                <img src={book.imageUrl} alt={book.title} className="h-32 w-32 object-cover mb-4"/>
                                 <h3 className="text-2xl font-semibold mb-2">{book.title}</h3>
                                 <p className="text-gray-600 mb-4">By {book.author}</p>
                                 <button
@@ -97,11 +101,7 @@ function BorrowerDashboardPage() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         {borrowedBooks.map((book) => (
                             <div key={book._id} className="bg-white rounded-lg shadow-md p-6">
-                                <img
-                                    src={book.imageUrl || 'https://via.placeholder.com/150'}
-                                    alt={book.title}
-                                    className="w-full h-48 object-cover mb-4 rounded"
-                                />
+                                <img src={book.imageUrl} alt={book.title} className="h-32 w-32 object-cover mb-4"/>
                                 <h3 className="text-2xl font-semibold mb-2">{book.title}</h3>
                                 <p className="text-gray-600 mb-4">By {book.author}</p>
                                 <button
