@@ -1,10 +1,13 @@
 import {useEffect, useState} from 'react';
 import axios from 'axios';
 import {useNavigate} from 'react-router-dom';
+import {toast} from 'react-toastify'; // To give users feedback
 
 function BorrowerDashboardPage() {
     const [availableBooks, setAvailableBooks] = useState([]);
     const [borrowedBooks, setBorrowedBooks] = useState([]);
+    const [loanHistory, setLoanHistory] = useState([]);
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
     const token = localStorage.getItem('token');
 
@@ -15,55 +18,58 @@ function BorrowerDashboardPage() {
     }, [token, navigate]);
 
     useEffect(() => {
-        const fetchBooks = async () => {
+        const fetchBooksAndLoans = async () => {
             try {
                 const response = await axios.get('http://localhost:5000/api/books');
                 setAvailableBooks(response.data.filter((book) => !book.borrowed));
                 setBorrowedBooks(response.data.filter((book) => book.borrowed));
+
+                // Fetch the borrower's loan history
+                const loanResponse = await axios.get('http://localhost:5000/api/loans/history', {
+                    headers: {Authorization: `Bearer ${token}`},
+                });
+                setLoanHistory(loanResponse.data);
             } catch (error) {
-                console.error('Error fetching books:', error);
+                console.error('Error fetching books or loans:', error);
+                toast.error('Unable to fetch data, please try again.');
             }
         };
-        fetchBooks();
-    }, []);
+        fetchBooksAndLoans();
+    }, [token]);
 
     const handleBorrowBook = async (bookId) => {
-        if (!token) {
-            alert('You need to register/login to borrow this book.');
-            navigate('/borrower-login');
-            return;
-        }
-
         try {
-            await axios.post(
-                `http://localhost:5000/api/loans/borrow`,
-                {bookId},
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
-            window.location.reload(); // Refresh the list after borrowing
+            setLoading(true);
+            await axios.post(`http://localhost:5000/api/loans/borrow`, {bookId}, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            toast.success('Book borrowed successfully!');
+            setLoading(false);
+            window.location.reload();
         } catch (error) {
             console.error('Error borrowing book:', error);
+            toast.error('Failed to borrow book.');
+            setLoading(false);
         }
     };
 
     const handleReturnBook = async (bookId) => {
         try {
-            await axios.post(
-                `http://localhost:5000/api/loans/return`,
-                {bookId},
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
-            window.location.reload(); // Refresh the list after returning
+            setLoading(true);
+            await axios.post(`http://localhost:5000/api/loans/return`, {bookId}, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            toast.success('Book returned successfully!');
+            setLoading(false);
+            window.location.reload();
         } catch (error) {
             console.error('Error returning book:', error);
+            toast.error('Failed to return book.');
+            setLoading(false);
         }
     };
 
@@ -77,7 +83,6 @@ function BorrowerDashboardPage() {
             <div className="max-w-6xl mx-auto">
                 <div className="flex justify-between items-center mb-8">
                     <h1 className="text-4xl font-bold text-gray-800">Borrower Dashboard</h1>
-                    {/* Logout Button */}
                     <button
                         onClick={handleLogout}
                         className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600"
@@ -85,42 +90,67 @@ function BorrowerDashboardPage() {
                         Logout
                     </button>
                 </div>
+
+                {/* Available Books Section */}
                 <div className="mb-12">
                     <h2 className="text-3xl font-bold mb-4">Available Books</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         {availableBooks.map((book) => (
                             <div key={book._id} className="bg-white rounded-lg shadow-md p-6">
                                 <img src={book.imageUrl} alt={book.title}
-                                     className="h-48 w-full object-cover mb-4 rounded"/>
+                                     className="w-full h-40 object-cover rounded-md mb-4"/>
                                 <h3 className="text-2xl font-semibold mb-2">{book.title}</h3>
                                 <p className="text-gray-600 mb-4">By {book.author}</p>
                                 <button
                                     onClick={() => handleBorrowBook(book._id)}
-                                    className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600"
+                                    disabled={loading}
+                                    className={`bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                                 >
-                                    Borrow
+                                    {loading ? 'Processing...' : 'Borrow'}
                                 </button>
                             </div>
                         ))}
                     </div>
                 </div>
-                <div>
+
+                {/* Borrowed Books Section */}
+                <div className="mb-12">
                     <h2 className="text-3xl font-bold mb-4">Borrowed Books</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         {borrowedBooks.map((book) => (
                             <div key={book._id} className="bg-white rounded-lg shadow-md p-6">
                                 <img src={book.imageUrl} alt={book.title}
-                                     className="h-48 w-full object-cover mb-4 rounded"/>
+                                     className="w-full h-40 object-cover rounded-md mb-4"/>
                                 <h3 className="text-2xl font-semibold mb-2">{book.title}</h3>
                                 <p className="text-gray-600 mb-4">By {book.author}</p>
                                 <button
                                     onClick={() => handleReturnBook(book._id)}
-                                    className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600"
+                                    disabled={loading}
+                                    className={`bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                                 >
-                                    Return
+                                    {loading ? 'Processing...' : 'Return'}
                                 </button>
                             </div>
                         ))}
+                    </div>
+                </div>
+
+                {/* Loan History Section */}
+                <div>
+                    <h2 className="text-3xl font-bold mb-4">Loan History</h2>
+                    <div className="bg-white rounded-lg shadow-md p-6">
+                        <ul>
+                            {loanHistory.length > 0 ? (
+                                loanHistory.map((loan) => (
+                                    <li key={loan._id} className="mb-4">
+                                        <strong>{loan.bookTitle}</strong> - Borrowed
+                                        on: {new Date(loan.borrowedDate).toLocaleDateString()}
+                                    </li>
+                                ))
+                            ) : (
+                                <p className="text-gray-600">No loan history found.</p>
+                            )}
+                        </ul>
                     </div>
                 </div>
             </div>
