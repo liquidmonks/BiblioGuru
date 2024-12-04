@@ -1,7 +1,8 @@
 import {useEffect, useState} from 'react';
 import axios from 'axios';
 import {useNavigate} from 'react-router-dom';
-import {toast} from 'react-toastify'; // To give users feedback
+import {toast, ToastContainer} from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function BorrowerDashboardPage() {
     const [availableBooks, setAvailableBooks] = useState([]);
@@ -80,6 +81,7 @@ function BorrowerDashboardPage() {
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-green-200 to-blue-200 p-8">
+            <ToastContainer/>
             <div className="max-w-6xl mx-auto">
                 <div className="flex justify-between items-center mb-8">
                     <h1 className="text-4xl font-bold text-gray-800">Borrower Dashboard</h1>
