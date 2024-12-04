@@ -28,6 +28,12 @@ function BorrowerDashboardPage() {
     }, []);
 
     const handleBorrowBook = async (bookId) => {
+        if (!token) {
+            alert('You need to register/login to borrow this book.');
+            navigate('/borrower-login');
+            return;
+        }
+
         try {
             await axios.post(
                 `http://localhost:5000/api/loans/borrow`,
@@ -71,6 +77,7 @@ function BorrowerDashboardPage() {
             <div className="max-w-6xl mx-auto">
                 <div className="flex justify-between items-center mb-8">
                     <h1 className="text-4xl font-bold text-gray-800">Borrower Dashboard</h1>
+                    {/* Logout Button */}
                     <button
                         onClick={handleLogout}
                         className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600"
@@ -83,7 +90,8 @@ function BorrowerDashboardPage() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         {availableBooks.map((book) => (
                             <div key={book._id} className="bg-white rounded-lg shadow-md p-6">
-                                <img src={book.imageUrl} alt={book.title} className="h-32 w-32 object-cover mb-4"/>
+                                <img src={book.imageUrl} alt={book.title}
+                                     className="h-48 w-full object-cover mb-4 rounded"/>
                                 <h3 className="text-2xl font-semibold mb-2">{book.title}</h3>
                                 <p className="text-gray-600 mb-4">By {book.author}</p>
                                 <button
@@ -101,7 +109,8 @@ function BorrowerDashboardPage() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         {borrowedBooks.map((book) => (
                             <div key={book._id} className="bg-white rounded-lg shadow-md p-6">
-                                <img src={book.imageUrl} alt={book.title} className="h-32 w-32 object-cover mb-4"/>
+                                <img src={book.imageUrl} alt={book.title}
+                                     className="h-48 w-full object-cover mb-4 rounded"/>
                                 <h3 className="text-2xl font-semibold mb-2">{book.title}</h3>
                                 <p className="text-gray-600 mb-4">By {book.author}</p>
                                 <button

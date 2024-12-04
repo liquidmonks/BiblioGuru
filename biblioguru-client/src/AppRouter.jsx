@@ -8,6 +8,7 @@ import ManageBooksPage from './pages/ManageBooksPage'; // Import Manage Books Pa
 import ManageBorrowersPage from './pages/ManageBorrowersPage'; // Import Manage Borrowers Page
 import ManageLoansPage from './pages/ManageLoansPage'; // Import Manage Loans Page
 import ReportsPage from './pages/ReportsPage'; // Import Reports Page
+import BorrowerLoginPage from './pages/BorrowerLoginPage'; // Import Borrower Login Page
 
 function AppRouter() {
     return (
@@ -17,6 +18,7 @@ function AppRouter() {
                 <Route path="/" element={<BorrowerPage/>}/>
                 <Route path="/login" element={<LoginPage/>}/>
                 <Route path="/register" element={<RegisterPage/>}/>
+                <Route path="/borrower-login" element={<BorrowerLoginPage/>}/> {/* Added Borrower Login Page */}
 
                 {/* Borrower Routes */}
                 <Route path="/borrower-dashboard" element={<BorrowerDashboardPage/>}/>
