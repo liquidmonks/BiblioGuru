@@ -1,4 +1,4 @@
-import {Link, useNavigate} from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 import {useEffect} from 'react';
 
 function Dashboard() {
@@ -11,6 +11,11 @@ function Dashboard() {
             navigate('/'); // Redirect to login if no token is found
         }
     }, [navigate]);
+
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        navigate('/');
+    };
 
     return (
         <div
@@ -26,30 +31,40 @@ function Dashboard() {
 
                 {/* Navigation Buttons */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                    <Link
-                        to="/manage-books"
-                        className="bg-gradient-to-r from-blue-500 to-blue-600 text-white font-bold py-4 px-6 rounded-lg shadow-md hover:shadow-xl hover:bg-blue-700 transform transition duration-300 flex items-center justify-center"
+                    <button
+                        onClick={() => navigate('/manage-books')}
+                        className="bg-gradient-to-r from-blue-500 to-blue-600 text-white font-bold py-4 px-6 rounded-lg shadow-md hover:shadow-xl hover:bg-blue-700 transform transition duration-300"
                     >
                         📚 Manage Books
-                    </Link>
-                    <Link
-                        to="/manage-borrowers"
-                        className="bg-gradient-to-r from-green-500 to-green-600 text-white font-bold py-4 px-6 rounded-lg shadow-md hover:shadow-xl hover:bg-green-700 transform transition duration-300 flex items-center justify-center"
+                    </button>
+                    <button
+                        onClick={() => navigate('/manage-borrowers')}
+                        className="bg-gradient-to-r from-green-500 to-green-600 text-white font-bold py-4 px-6 rounded-lg shadow-md hover:shadow-xl hover:bg-green-700 transform transition duration-300"
                     >
                         👥 Manage Borrowers
-                    </Link>
-                    <Link
-                        to="/manage-loans"
-                        className="bg-gradient-to-r from-yellow-500 to-yellow-600 text-white font-bold py-4 px-6 rounded-lg shadow-md hover:shadow-xl hover:bg-yellow-700 transform transition duration-300 flex items-center justify-center"
+                    </button>
+                    <button
+                        onClick={() => navigate('/manage-loans')}
+                        className="bg-gradient-to-r from-yellow-500 to-yellow-600 text-white font-bold py-4 px-6 rounded-lg shadow-md hover:shadow-xl hover:bg-yellow-700 transform transition duration-300"
                     >
                         🔄 Manage Loans
-                    </Link>
-                    <Link
-                        to="/reports"
-                        className="bg-gradient-to-r from-purple-500 to-purple-600 text-white font-bold py-4 px-6 rounded-lg shadow-md hover:shadow-xl hover:bg-purple-700 transform transition duration-300 flex items-center justify-center"
+                    </button>
+                    <button
+                        onClick={() => navigate('/reports')}
+                        className="bg-gradient-to-r from-purple-500 to-purple-600 text-white font-bold py-4 px-6 rounded-lg shadow-md hover:shadow-xl hover:bg-purple-700 transform transition duration-300"
                     >
                         📊 Generate Reports
-                    </Link>
+                    </button>
+                </div>
+
+                {/* Logout Button */}
+                <div className="mt-8">
+                    <button
+                        onClick={handleLogout}
+                        className="bg-red-500 text-white font-bold py-4 px-6 rounded-lg shadow-md hover:shadow-xl hover:bg-red-700 transform transition duration-300"
+                    >
+                        🚪 Logout
+                    </button>
                 </div>
             </div>
         </div>
