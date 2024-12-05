@@ -2,8 +2,8 @@ import Book from '../models/Book.js';
 import Loan from '../models/Loan.js';
 import moment from 'moment';
 
-// Borrow a book
-export const borrowBook = async (req, res) => {
+// Borrow a book (Request Verification)
+export async function borrowBook(req, res) {
     try {
         const borrowerId = req.user.id;
         const book = await Book.findById(req.params.id);
@@ -40,10 +40,10 @@ export const borrowBook = async (req, res) => {
     } catch (err) {
         res.status(500).json({error: 'Server Error'});
     }
-};
+}
 
-// Return a book
-export const returnBook = async (req, res) => {
+// Return a book (Request Verification)
+export async function returnBook(req, res) {
     try {
         const book = await Book.findById(req.params.id);
         if (!book) {
@@ -58,6 +58,7 @@ export const returnBook = async (req, res) => {
         const loan = await Loan.findOne({book: book._id, status: 'Borrowed'});
         if (loan) {
             loan.status = 'Verification';
+            loan.returnedDate = new Date(); // Set return request date
             await loan.save();
         }
 
@@ -65,10 +66,10 @@ export const returnBook = async (req, res) => {
     } catch (err) {
         res.status(500).json({error: 'Server Error'});
     }
-};
+}
 
 // Admin approves the loan (either borrow or return)
-export const approveLoan = async (req, res) => {
+export async function approveLoan(req, res) {
     try {
         const loan = await Loan.findById(req.params.id).populate('book');
         if (!loan) {
@@ -98,10 +99,10 @@ export const approveLoan = async (req, res) => {
     } catch (err) {
         res.status(500).json({error: 'Server Error'});
     }
-};
+}
 
-// Get loan history
-export const getLoanHistory = async (req, res) => {
+// Get loan history for borrower
+export async function getLoanHistory(req, res) {
     try {
         const borrowerId = req.user.id;
         const loans = await Loan.find({borrower: borrowerId}).populate('book');
@@ -110,14 +111,14 @@ export const getLoanHistory = async (req, res) => {
     } catch (err) {
         res.status(500).json({error: 'Server Error'});
     }
-};
+}
 
 // Get all loans for admin
-export const getAllLoans = async (req, res) => {
+export async function getAllLoans(req, res) {
     try {
         const loans = await Loan.find().populate('book borrower');
         res.status(200).json(loans);
     } catch (err) {
         res.status(500).json({error: 'Server Error'});
     }
-};
+}
