@@ -30,7 +30,7 @@ const app = express();
 
 // Middleware
 app.use(express.json()); // Allows express to parse JSON requests
-app.use(cors()); // Enable CORS for all origins (could restrict to specific origins if needed)
+app.use(cors()); // Enable CORS for all origins
 
 // Define routes
 app.use('/api/books', bookRoutes);
