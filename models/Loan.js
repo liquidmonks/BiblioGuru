@@ -11,18 +11,15 @@ const LoanSchema = new mongoose.Schema({
         ref: 'Book',
         required: true,
     },
-    borrowedDate: {
-        type: Date,
-        default: Date.now,
-    },
-    returnedDate: {
-        type: Date,
-    },
     status: {
         type: String,
-        enum: ['Borrowed', 'Returned'],
-        default: 'Borrowed',
+        enum: ['Borrowed', 'Returned', 'Verification'],
+        required: true,
+        default: 'Verification', // Default to verification phase
     },
+    borrowedDate: Date,
+    dueDate: Date,
+    returnedDate: Date,
 });
 
 const Loan = mongoose.model('Loan', LoanSchema);

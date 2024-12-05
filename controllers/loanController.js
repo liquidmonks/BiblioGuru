@@ -1,6 +1,6 @@
 import Book from '../models/Book.js';
 import Loan from '../models/Loan.js';
-import moment from 'moment'; // Use moment.js to handle dates
+import moment from 'moment';
 
 // Borrow a book
 export const borrowBook = async (req, res) => {
@@ -16,26 +16,27 @@ export const borrowBook = async (req, res) => {
             return res.status(400).json({error: 'Book is already borrowed'});
         }
 
+        // Check if there's already a loan in Verification status for this book
+        const existingLoan = await Loan.findOne({book: book._id, status: 'Verification'});
+        if (existingLoan) {
+            return res.status(400).json({error: 'Loan request already in verification'});
+        }
+
         // Set due date (e.g., 14 days from now)
         const dueDate = moment().add(14, 'days').toDate();
 
-        // Create a new loan record
+        // Create a new loan record in Verification state
         const loan = new Loan({
             borrower: borrowerId,
             book: book._id,
-            status: 'Borrowed',
+            status: 'Verification',
             borrowedDate: new Date(),
             dueDate: dueDate
         });
 
         await loan.save();
 
-        // Update book status
-        book.borrowed = true;
-        book.borrower = borrowerId;
-        await book.save();
-
-        res.status(200).json({message: 'Book borrowed successfully'});
+        res.status(200).json({message: 'Loan request is in verification'});
     } catch (err) {
         res.status(500).json({error: 'Server Error'});
     }
@@ -44,35 +45,62 @@ export const borrowBook = async (req, res) => {
 // Return a book
 export const returnBook = async (req, res) => {
     try {
-        const loanId = req.params.id;
-        const loan = await Loan.findById(loanId).populate('book');
-
-        if (!loan) {
-            return res.status(404).json({error: 'Loan not found'});
+        const book = await Book.findById(req.params.id);
+        if (!book) {
+            return res.status(404).json({error: 'Book not found'});
         }
 
-        if (loan.status !== 'Borrowed') {
-            return res.status(400).json({error: 'Book is not currently borrowed'});
+        if (!book.borrowed) {
+            return res.status(400).json({error: 'Book is not borrowed'});
         }
 
-        // Update book status
-        const book = loan.book;
-        book.borrowed = false;
-        book.borrower = null;
-        await book.save();
+        // Update the loan status to Verification for admin approval
+        const loan = await Loan.findOne({book: book._id, status: 'Borrowed'});
+        if (loan) {
+            loan.status = 'Verification';
+            await loan.save();
+        }
 
-        // Update the loan record
-        loan.returnedDate = new Date();
-        loan.status = 'Returned';
-        await loan.save();
-
-        res.status(200).json({message: 'Book returned successfully'});
+        res.status(200).json({message: 'Return request is in verification'});
     } catch (err) {
         res.status(500).json({error: 'Server Error'});
     }
 };
 
-// Get loan history for a borrower
+// Admin approves the loan (either borrow or return)
+export const approveLoan = async (req, res) => {
+    try {
+        const loan = await Loan.findById(req.params.id).populate('book');
+        if (!loan) {
+            return res.status(404).json({error: 'Loan not found'});
+        }
+
+        if (loan.status !== 'Verification') {
+            return res.status(400).json({error: 'Loan is not in verification state'});
+        }
+
+        if (loan.returnedDate) {
+            // Approve a return
+            loan.status = 'Returned';
+            loan.book.borrowed = false;
+            loan.book.borrower = null;
+        } else {
+            // Approve a borrow
+            loan.status = 'Borrowed';
+            loan.book.borrowed = true;
+            loan.book.borrower = loan.borrower;
+        }
+
+        await loan.book.save();
+        await loan.save();
+
+        res.status(200).json({message: 'Loan approved successfully'});
+    } catch (err) {
+        res.status(500).json({error: 'Server Error'});
+    }
+};
+
+// Get loan history
 export const getLoanHistory = async (req, res) => {
     try {
         const borrowerId = req.user.id;
