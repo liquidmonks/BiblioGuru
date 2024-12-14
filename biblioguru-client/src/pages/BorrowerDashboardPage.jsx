@@ -19,6 +19,7 @@ function BorrowerDashboardPage() {
                 setBooks(response.data);
             } catch (error) {
                 console.error('Error fetching books:', error);
+                toast.error('Failed to fetch books.');
             }
         };
 
@@ -32,6 +33,7 @@ function BorrowerDashboardPage() {
                 setBorrowedBooks(response.data);
             } catch (error) {
                 console.error('Error fetching borrowed books:', error);
+                toast.error('Failed to fetch borrowed books.');
             }
         };
 
@@ -42,24 +44,24 @@ function BorrowerDashboardPage() {
     const handleBorrowBook = async (bookId) => {
         try {
             setLoading(true);
-            const response = await axios.post(`http://localhost:5000/api/loans/borrow/${bookId}`, {}, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            toast.success(response.data.message);
-            setLoading(false);
-            // Refresh the borrowed books list
-            const updatedBooks = books.map((book) =>
-                book._id === bookId ? {...book, status: 'Pending Approval'} : book
+            const response = await axios.post(
+                `http://localhost:5000/api/loans/borrow`,
+                {bookId},
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
             );
-            setBooks(updatedBooks);
+            toast.success(response.data.message || 'Book borrowed successfully.');
+            setLoading(false);
+            // Refresh books and borrowed books
+            fetchBooks();
+            fetchBorrowedBooks();
         } catch (error) {
-            console.error('Error borrowing book:', error);
+            console.error('Error borrowing book:', error.response || error);
             toast.error(
-                error.response && error.response.data && error.response.data.error
-                    ? error.response.data.error
-                    : 'Failed to borrow book.'
+                error.response?.data?.error || 'Failed to borrow book. Please try again.'
             );
             setLoading(false);
         }
@@ -92,7 +94,7 @@ function BorrowerDashboardPage() {
             <ul>
                 {borrowedBooks.map((loan) => (
                     <li key={loan._id}>
-                        {loan.book.title} - Status: {loan.status}
+                        {loan.book?.title || 'Unknown Book'} - Status: {loan.status}
                     </li>
                 ))}
             </ul>
