@@ -16,16 +16,13 @@ export async function borrowBook(req, res) {
             return res.status(400).json({error: 'Book is already borrowed'});
         }
 
-        // Check if there's already a loan in Verification status for this book
         const existingLoan = await Loan.findOne({book: book._id, status: 'Verification'});
         if (existingLoan) {
             return res.status(400).json({error: 'Loan request already in verification'});
         }
 
-        // Set due date (e.g., 14 days from now)
         const dueDate = moment().add(14, 'days').toDate();
 
-        // Create a new loan record in Verification state
         const loan = new Loan({
             borrower: borrowerId,
             book: book._id,
@@ -35,7 +32,6 @@ export async function borrowBook(req, res) {
         });
 
         await loan.save();
-
         res.status(200).json({message: 'Loan request is in verification'});
     } catch (err) {
         res.status(500).json({error: 'Server Error'});
@@ -54,11 +50,10 @@ export async function returnBook(req, res) {
             return res.status(400).json({error: 'Book is not borrowed'});
         }
 
-        // Update the loan status to Verification for admin approval
         const loan = await Loan.findOne({book: book._id, status: 'Borrowed'});
         if (loan) {
             loan.status = 'Verification';
-            loan.returnedDate = new Date(); // Set return request date
+            loan.returnedDate = new Date();
             await loan.save();
         }
 
@@ -68,7 +63,7 @@ export async function returnBook(req, res) {
     }
 }
 
-// Admin approves the loan (either borrow or return)
+// Admin approves the loan
 export async function approveLoan(req, res) {
     try {
         const loan = await Loan.findById(req.params.id).populate('book');
@@ -81,12 +76,10 @@ export async function approveLoan(req, res) {
         }
 
         if (loan.returnedDate) {
-            // Approve a return
             loan.status = 'Returned';
             loan.book.borrowed = false;
             loan.book.borrower = null;
         } else {
-            // Approve a borrow
             loan.status = 'Borrowed';
             loan.book.borrowed = true;
             loan.book.borrower = loan.borrower;
@@ -118,6 +111,27 @@ export async function getAllLoans(req, res) {
     try {
         const loans = await Loan.find().populate('book borrower');
         res.status(200).json(loans);
+    } catch (err) {
+        res.status(500).json({error: 'Server Error'});
+    }
+}
+
+// Verify return of a book
+export async function verifyReturn(req, res) {
+    try {
+        const loan = await Loan.findById(req.params.id).populate('book');
+        if (!loan) {
+            return res.status(404).json({error: 'Loan not found'});
+        }
+
+        if (loan.status !== 'Returned') {
+            return res.status(400).json({error: 'Book is not marked as returned'});
+        }
+
+        loan.verification = 'Verified';
+        await loan.save();
+
+        res.status(200).json({message: 'Book return verified successfully'});
     } catch (err) {
         res.status(500).json({error: 'Server Error'});
     }

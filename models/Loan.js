@@ -1,26 +1,37 @@
 import mongoose from 'mongoose';
 
-const LoanSchema = new mongoose.Schema({
-    borrower: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Borrower',
-        required: true,
+const loanSchema = new mongoose.Schema(
+    {
+        book: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Book',
+            required: true,
+        },
+        borrower: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+            required: true,
+        },
+        status: {
+            type: String,
+            enum: ['Pending', 'Approved', 'Returned'],
+            default: 'Pending', // Initial state when loan is created
+        },
+        verification: {
+            type: String,
+            enum: ['Pending', 'Verified'],
+            default: 'Pending', // Verification state for returned books
+        },
+        borrowedDate: {
+            type: Date,
+            default: Date.now,
+        },
+        returnDate: {
+            type: Date,
+            required: false,
+        },
     },
-    book: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Book',
-        required: true,
-    },
-    status: {
-        type: String,
-        enum: ['Borrowed', 'Returned', 'Verification'],
-        required: true,
-        default: 'Verification', // Default to verification phase
-    },
-    borrowedDate: Date,
-    dueDate: Date,
-    returnedDate: Date,
-});
+    {timestamps: true}
+);
 
-const Loan = mongoose.model('Loan', LoanSchema);
-export default Loan;
+export default mongoose.model('Loan', loanSchema);
